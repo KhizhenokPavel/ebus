@@ -22,6 +22,12 @@ class OrganizationController extends Controller
             'name' => 'required|string',
         ]);
 
-        return Organization::searchByName($request->get('name'));
+        $organizationIds = Organization::searchByName($request->get('name'));
+
+        if ($organizationIds === false) {
+            return response()->json(['error' => __('errors.notFound', ['attribute' => 'Organization'])], 404);
+        }
+
+        return $organizationIds;
     }
 }

@@ -23,7 +23,7 @@ class Organization extends Model
         $activityInfo = Organization::with(['organizationPhones', 'organizationActivities', 'building'])
             ->where('id', $id);
 
-        if ($activityInfo->exists()) {
+        if (!$activityInfo->exists()) {
             return false;
         }
 
@@ -33,8 +33,14 @@ class Organization extends Model
         return $activityInfo->toArray();
     }
 
-    public static function searchByName(string $name): array {
-        return static::all()->where('name', $name)->pluck('id')->toArray();
+    public static function searchByName(string $name): array|false {
+        $organizations = static::query()->where('name', $name);
+
+        if (!$organizations->exists()) {
+            return false;
+        }
+
+        return $organizations->pluck('id')->toArray();
     }
 
     public static function getInBuilding(int $id): array|false {

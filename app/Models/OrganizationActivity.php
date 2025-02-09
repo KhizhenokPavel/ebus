@@ -20,7 +20,7 @@ class OrganizationActivity extends Model
             return false;
         }
 
-        return static::all()->where("activity_id", $activityId)->pluck('id')->toArray();
+        return static::query()->distinct()->where("activity_id", $activityId)->pluck('id')->toArray();
     }
 
     public static function getOrganizationsByGroupActivity(int $activityId): array|false {
