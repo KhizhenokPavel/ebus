@@ -1,0 +1,368 @@
+openapi: 3.0.3
+info:
+  title: Тестовое задание "Создание REST API приложения"
+  description: |-
+    Описание запросов тестового задания
+  version: 1.0.11
+servers:
+  - url: http://localhost/api
+tags:
+  - name: organizations
+    description: Информация об организациях
+  - name: buildings
+    description: Информация о зданиях
+  - name: activities
+    description: Информация о родах деятельности
+  - name: territories
+    description: Информация о территории
+security:
+  - apiKey: []
+paths:
+  /buildings/{id}/organizations:
+    get:
+      tags:
+        - buildings
+      summary: Список всех организаций в конкретном здании
+      description: Получение списка всех организаций находящихся в конкретном здании
+      parameters:
+        - $ref: '#/components/parameters/ElemetId'
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationsList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /activities/{id}/self/organizations:
+    get:
+      tags:
+        - activities
+      summary: Список всех организаций по конкретному виду деятельности
+      description: Получение списка всех организаций, которые относятся к конкретному виду деятельности
+      parameters:
+        - $ref: '#/components/parameters/ElemetId'
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationsList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /territories/buildingsAndOrganizations:
+    get:
+      tags:
+        - territories
+      summary: Список всех зданий и организаций в заданной области
+      description: Получение списка зданий и организаций, которые находятся в заданном радиусе/прямоугольной области относительно указанной точки на карте.
+      parameters:
+        - $ref: '#/components/parameters/AreaTypeParameter'
+        - $ref: '#/components/parameters/RadiusParameter'
+        - $ref: '#/components/parameters/CentralPointLongitudeParameter'
+        - $ref: '#/components/parameters/CentralPointLatitudeParameter'
+        - $ref: '#/components/parameters/FirstPointLongitudeParameter'
+        - $ref: '#/components/parameters/FirstPointLatitudeParameter'
+        - $ref: '#/components/parameters/SecondPointLongitudeParameter'
+        - $ref: '#/components/parameters/SecondPointLatitudeParameter'
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BuildingsAndOrganizationsList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/InvalidParametrs'
+  /organizations/{id}:
+    get:
+      tags:
+        - organizations
+      summary: Информация об организации
+      description: Получение информации об организации по её идентификатору
+      parameters:
+        - $ref: '#/components/parameters/ElemetId'
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationInfo'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /activities/{id}/group/organizations:
+    get:
+      tags:
+        - activities
+      summary: Список всех организаций по роду деятельности
+      description: Получение списка всех организаций по виду деятельности. Например, поиск по виду деятельности «Еда», которая находится на первом уровне дерева, и чтобы нашлись все организации, которые относятся к видам деятельности, лежащим внутри. Т.е. в результатах поиска должны отобразиться организации с видом деятельности Еда, Мясная продукция, Молочная продукция.
+      parameters:
+        - $ref: '#/components/parameters/ElemetId'
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationsList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /organizations/searchByName:
+    get:
+      tags:
+        - organizations
+      summary: Поиск организации по названию
+      description: Поиск организации по названию.
+      parameters:
+        - name: name
+          in: query
+          description: Название организации
+          example: Farrell, Harber and Jerde
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationsList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  parameters:
+    ElemetId:
+      name: id
+      in: path
+      example: 5
+      required: true
+      schema:
+        type: number
+        minimum: 1
+      description: Параметр id запроса
+  
+    AreaTypeParameter:
+      name: areaType
+      in: query
+      required: true
+      schema:
+        type: integer
+        enum: [0, 1]
+      description: Тип области поиска (0 - круг, 1 - прямоугольник)
+
+    RadiusParameter:
+      name: radius
+      in: query
+      required: false
+      example: 2991321
+      schema:
+        type: number
+        minimum: 0
+      description: Радиус в метрах (обязательно, если areaType равно 0)
+
+    CentralPointLongitudeParameter:
+      name: centralPointLongitude
+      in: query
+      required: false
+      example: -41.3330860
+      schema:
+        type: number
+        minimum: -180
+        maximum: 180
+      description: Долгота центральной точки (обязательно, если areaType равно 0)
+
+    CentralPointLatitudeParameter:
+      name: centralPointLatitude
+      in: query
+      required: false
+      example: -62.2222870
+      schema:
+        type: number
+        minimum: -90
+        maximum: 90
+      description: Широта центральной точки (обязательно, если areaType равно 0)
+
+    FirstPointLatitudeParameter:
+      name: firstPointLatitude
+      in: query
+      required: false
+      example: -62.222287
+      schema:
+        type: number
+        minimum: -90
+        maximum: 90
+      description: Широта первой точки (обязательно, если areaType равно 1)
+
+    FirstPointLongitudeParameter:
+      name: firstPointLongitude
+      in: query
+      example: -40.333086
+      required: false
+      schema:
+        type: number
+        minimum: -180
+        maximum: 180
+      description: Долгота первой точки (обязательно, если areaType равно 1)
+
+    SecondPointLatitudeParameter:
+      name: secondPointLatitude
+      in: query
+      required: false
+      example: -60.222287
+      schema:
+        type: number
+        minimum: -90
+        maximum: 90
+      description: Широта второй точки (обязательно, если areaType равно 1)
+
+    SecondPointLongitudeParameter:
+      name: secondPointLongitude
+      in: query
+      required: false
+      example: -43.333086
+      schema:
+        type: number
+        minimum: -180
+        maximum: 180
+      description: Долгота второй точки (обязательно, если areaType равно 1)
+
+  responses:
+    NotFound:
+      description: Элемент не найден
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Элемент не найден
+    InvalidParametrs:
+      description: Неверные параметры запроса
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: The radius field must be a number.
+              errors:
+                type: object
+                properties:
+                  radius:
+                    type: array
+                    items:
+                      type: string
+                      example: The radius field must be a number.
+    Unauthorized:
+      description: Пользователь неавторизирован
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Unauthorized
+  schemas:
+    OrganizationInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 5
+        name:
+          type: string
+          example: Grady Group
+        building_id:
+          type: number
+          example: 7
+        organization_phones:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+                example: 9
+              organization_id:
+                type: number
+                example: 4
+              phone_number:
+                type: string
+                example: 615-398-3420
+        organization_activities:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+                example: 9
+              organization_id:
+                type: number
+                example: 4
+              activity_id:
+                type: number
+                example: 2
+              activity:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    example: 9
+                  name:
+                    type: string
+                    example: Мясная продукция
+                  parent_id:
+                    type: number
+                    example: 2
+        activity:
+          type: object
+          properties:
+            id:
+              type: number
+              example: 9
+            address:
+              type: string
+              example: 5634 Pacocha Inlet Apt. 464\nSierrahaven, FL 37569
+            longitude:
+              type: string
+              example: 147.9213750
+            latitude:
+              type: string
+              example: 88.1558660
+    BuildingsAndOrganizationsList:
+      type: object
+      properties:
+        builingIds:
+          type: integer
+          example: [1, 2, 3]
+        organizaionIds:
+          type: integer
+          example: [1, 2, 3]
+    OrganizationsList:
+      type: integer
+      example: [1, 2, 3]
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      name: X-API-KEY
+      in: header

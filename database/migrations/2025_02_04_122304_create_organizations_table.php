@@ -14,15 +14,22 @@ return new class extends Migration
         Schema::create('organizations', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->json('phone_numbers');
-            $table->foreignId('building_id')->constrained();
+            $table->foreignId('building_id')->constrained('buildings');
             $table->timestamps();
         });
 
-        Schema::create('organization_activity', function (Blueprint $table) {
+        Schema::create('organization_phones', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('organization_id')->constrained()->onDelete('cascade');
-            $table->foreignId('activity_id')->constrained()->onDelete('cascade');
+            $table->foreignId('organization_id')->constrained('organizations');
+            $table->string('phone_number');
+            $table->timestamps();
+        });
+
+        Schema::create('organization_activities', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('organization_id')->constrained('organizations');
+            $table->foreignId('activity_id')->constrained('activities');
+            $table->timestamps();
         });
     }
 
@@ -31,6 +38,8 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('organization_activities');
+        Schema::dropIfExists('organization_phones');
         Schema::dropIfExists('organizations');
     }
 };
