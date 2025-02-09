@@ -34,6 +34,15 @@
         }
     },
     "scripts": {
+        "init-project": [
+            "chmod -R gu+w storage",
+            "chmod -R guo+w storage",
+            "cp .env.example .env",
+            "composer install",
+            "php artisan key:generate",
+            "php artisan migrate",
+            "php artisan db:seed"
+        ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
