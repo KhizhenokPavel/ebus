@@ -25,7 +25,7 @@ paths:
       summary: Список всех организаций в конкретном здании
       description: Получение списка всех организаций находящихся в конкретном здании
       parameters:
-        - $ref: '#/components/parameters/ElemetId'
+        - $ref: '#/components/parameters/ElementId'
       responses:
         '200':
           description: Успешный ответ
@@ -44,7 +44,7 @@ paths:
       summary: Список всех организаций по конкретному виду деятельности
       description: Получение списка всех организаций, которые относятся к конкретному виду деятельности
       parameters:
-        - $ref: '#/components/parameters/ElemetId'
+        - $ref: '#/components/parameters/ElementId'
       responses:
         '200':
           description: Успешный ответ
@@ -81,7 +81,7 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
         '422':
-          $ref: '#/components/responses/InvalidParametrs'
+          $ref: '#/components/responses/InvalidParameters'
   /organizations/{id}:
     get:
       tags:
@@ -89,7 +89,7 @@ paths:
       summary: Информация об организации
       description: Получение информации об организации по её идентификатору
       parameters:
-        - $ref: '#/components/parameters/ElemetId'
+        - $ref: '#/components/parameters/ElementId'
       responses:
         '200':
           description: Успешный ответ
@@ -108,7 +108,7 @@ paths:
       summary: Список всех организаций по роду деятельности
       description: Получение списка всех организаций по виду деятельности. Например, поиск по виду деятельности «Еда», которая находится на первом уровне дерева, и чтобы нашлись все организации, которые относятся к видам деятельности, лежащим внутри. Т.е. в результатах поиска должны отобразиться организации с видом деятельности Еда, Мясная продукция, Молочная продукция.
       parameters:
-        - $ref: '#/components/parameters/ElemetId'
+        - $ref: '#/components/parameters/ElementId'
       responses:
         '200':
           description: Успешный ответ
@@ -147,7 +147,7 @@ paths:
           $ref: '#/components/responses/NotFound'
 components:
   parameters:
-    ElemetId:
+    ElementId:
       name: id
       in: path
       example: 5
@@ -156,7 +156,7 @@ components:
         type: number
         minimum: 1
       description: Параметр id запроса
-  
+
     AreaTypeParameter:
       name: areaType
       in: query
@@ -253,7 +253,7 @@ components:
               error:
                 type: string
                 example: Элемент не найден
-    InvalidParametrs:
+    InvalidParameters:
       description: Неверные параметры запроса
       content:
         application/json:
@@ -352,10 +352,10 @@ components:
     BuildingsAndOrganizationsList:
       type: object
       properties:
-        builingIds:
+        buildingIds:
           type: integer
           example: [1, 2, 3]
-        organizaionIds:
+        organizationIds:
           type: integer
           example: [1, 2, 3]
     OrganizationsList:
